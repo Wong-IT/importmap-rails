@@ -138,7 +138,7 @@ class Importmap::Map
   def expand_directories_into(paths)
     @directories.values.each do |mapping|
       if (absolute_path = absolute_root_of(mapping.dir)).exist?
-        find_javascript_files_in_tree(absolute_path).each do |filename|
+        find_javascript_files_in_tree(absolute_path).sort.each do |filename|
           module_filename = filename.relative_path_from(absolute_path)
           module_name = module_name_from(module_filename, mapping)
           module_path = module_path_from(module_filename, mapping)

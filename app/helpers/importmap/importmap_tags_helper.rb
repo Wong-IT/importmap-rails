@@ -8,14 +8,14 @@ module Importmap::ImportmapTagsHelper
       javascript_importmap_module_preload_tags,
       (javascript_importmap_shim_nonce_configuration_tag if shim),
       (javascript_importmap_shim_tag if shim),
-      javascript_import_module_tag(entry_point),
+      javascript_import_module_tag(entry_point)
     ].compact, "\n"
   end
 
   # Generate an inline importmap tag using the passed `importmap_json` JSON string.
   # By default, `Rails.application.importmap.to_json(resolver: self)` is used.
   def javascript_inline_importmap_tag(importmap_json = Rails.application.importmap.to_json(resolver: self))
-    tag.script importmap_json.html_safe,
+    tag.script importmap_json.html_safe
       type: "importmap", "data-turbo-track": "reload", nonce: request&.content_security_policy_nonce
   end
 
@@ -23,7 +23,7 @@ module Importmap::ImportmapTagsHelper
   def javascript_importmap_shim_nonce_configuration_tag
     if request&.content_security_policy
       tag.script({ nonce: request.content_security_policy_nonce }.to_json.html_safe,
-                 type: "esms-options", nonce: request.content_security_policy_nonce)
+        type: "esms-options", nonce: request.content_security_policy_nonce)
     end
   end
 
