@@ -52,6 +52,8 @@ class Importmap::Map
   # want these resolved paths to use. In case you need to resolve for different asset hosts, you can pass in a custom
   # `cache_key` to vary the cache used by this method for the different cases.
   def to_json(resolver:, cache_key: :json, groups: nil)
+    cache_key = groups.join("_").to_sym if groups.present?
+
     cache_as(cache_key) do
       selected_packages_and_directories = expanded_packages_and_directories
 
