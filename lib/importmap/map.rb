@@ -51,9 +51,17 @@ class Importmap::Map
   # `ApplicationController.helpers`. You'll want to use the resolver that has been configured for the `asset_host` you
   # want these resolved paths to use. In case you need to resolve for different asset hosts, you can pass in a custom
   # `cache_key` to vary the cache used by this method for the different cases.
-  def to_json(resolver:, cache_key: :json)
+  def to_json(resolver:, cache_key: :json, groups: nil)
     cache_as(cache_key) do
-      JSON.pretty_generate({ "imports" => resolve_asset_paths(expanded_packages_and_directories, resolver: resolver) })
+      selected_packages_and_directories = expanded_packages_and_directories
+
+      if groups.present?
+        selected_packages_and_directories = expanded_packages_and_directories.select do |name, mapping|
+          mapping.group.nil? || groups.include?(mapping.group)
+        end
+      end
+
+      JSON.pretty_generate({ "imports" => resolve_asset_paths(selected_packages_and_directories, resolver: resolver) })
     end
   end
 

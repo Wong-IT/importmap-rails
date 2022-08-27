@@ -1,12 +1,14 @@
 module Importmap::ImportmapTagsHelper
   # Setup all script tags needed to use an importmap-powered entrypoint (which defaults to application.js)
-  def javascript_importmap_tags(entry_point = "application", shim: true)
+  def javascript_importmap_tags(entry_point = "application", shim: true, groups: [])
+    importmap_json = Rails.application.importmap.to_json(resolver: self, groups: groups)
+
     safe_join [
-      javascript_inline_importmap_tag,
+      javascript_inline_importmap_tag(importmap_json),
       javascript_importmap_module_preload_tags,
       (javascript_importmap_shim_nonce_configuration_tag if shim),
       (javascript_importmap_shim_tag if shim),
-      javascript_import_module_tag(entry_point)
+      javascript_import_module_tag(entry_point),
     ].compact, "\n"
   end
 
@@ -21,7 +23,7 @@ module Importmap::ImportmapTagsHelper
   def javascript_importmap_shim_nonce_configuration_tag
     if request&.content_security_policy
       tag.script({ nonce: request.content_security_policy_nonce }.to_json.html_safe,
-        type: "esms-options", nonce: request.content_security_policy_nonce)
+                 type: "esms-options", nonce: request.content_security_policy_nonce)
     end
   end
 
@@ -34,7 +36,7 @@ module Importmap::ImportmapTagsHelper
   # Import a named JavaScript module(s) using a script-module tag.
   def javascript_import_module_tag(*module_names)
     imports = Array(module_names).collect { |m| %(import "#{m}") }.join("\n")
-    tag.script imports.html_safe, 
+    tag.script imports.html_safe,
       type: "module", nonce: request&.content_security_policy_nonce
   end
 
